@@ -1,0 +1,4 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#CCCCCC"/> <!-- Change this color to your desired shade of grey -->
+    <corners android:radius="4dp"/>
+</shape>
