@@ -1,12 +1,11 @@
 package com.example.schedularreminder
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -21,8 +20,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var reminderEditText: EditText
     private lateinit var selectedDate: String
     private lateinit var selectedTime: String
+    companion object {
+        const val CHANNEL_ID = "reminder_channel"
+    }
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -57,35 +58,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addReminder(reminderText: String, date: String, time: String) {
-        val remindersLayout: LinearLayout = findViewById(R.id.remindersLayout)
-
-        val reminderLayout = LinearLayout(this)
-        reminderLayout.orientation = LinearLayout.HORIZONTAL
-        reminderLayout.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        val reminderButton = Button(this)
-        reminderButton.text = "$reminderText\nDate: $date, Time: $time"
-        reminderButton.layoutParams = LinearLayout.LayoutParams(
-            0,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            1f
-        )
-
-        val deleteButton = Button(this)
-        deleteButton.text = "Delete"
-        deleteButton.setOnClickListener {
-            remindersLayout.removeView(reminderLayout)
-        }
-
-        reminderLayout.addView(reminderButton)
-        reminderLayout.addView(deleteButton)
-        remindersLayout.addView(reminderLayout)
-    }
-
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -113,13 +85,45 @@ class MainActivity : AppCompatActivity() {
         timePickerDialog.show()
     }
 
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-            startActivity(intent)
-        } else {
+    private fun addReminder(reminderText: String, date: String, time: String) {
+        val remindersLayout: LinearLayout = findViewById(R.id.remindersLayout)
 
+        val reminderLayout = LinearLayout(this)
+        reminderLayout.orientation = LinearLayout.HORIZONTAL
+        reminderLayout.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val reminderButton = Button(this)
+        reminderButton.text = "$reminderText\nDate: $date, Time: $time"
+        reminderButton.layoutParams = LinearLayout.LayoutParams(
+            0,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            1f
+        )
+
+        val deleteButton = Button(this)
+        deleteButton.text = "x"
+        deleteButton.setBackgroundResource(R.drawable.square)
+        val deleteButtonLayoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        deleteButtonLayoutParams.gravity = Gravity.CENTER_VERTICAL
+        deleteButton.layoutParams = deleteButtonLayoutParams
+        deleteButton.setOnClickListener {
+            remindersLayout.removeView(reminderLayout)
         }
+
+        reminderLayout.addView(reminderButton)
+        reminderLayout.addView(deleteButton)
+        remindersLayout.addView(reminderLayout)
+    }
+
+    private fun requestNotificationPermission() {
+        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        startActivity(intent)
     }
 }
